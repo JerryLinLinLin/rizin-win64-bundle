@@ -20,7 +20,6 @@ Everything ships as a single bundle, `rizin-windows-x64-0.8.2-bundle.zip`: downl
 - [Included Components](#included-components)
 - [What's Customized](#whats-customized)
 - [Example Commands](#example-commands)
-- [Verification](#verification)
 - [Agent Skill](#agent-skill)
 - [License](#license)
 
@@ -149,31 +148,6 @@ Fa             # apply matching signatures from the sigdb
 fs flirt       # switch to the flirt flag space
 fl             # list the matched library-function flags
 ```
-
-## Verification
-
-The bundle was tested after relocation, with `SLEIGHHOME` cleared and Rizin startup scripts disabled via `-N`.
-
-**Test matrix**
-
-- 4 binaries covering `.exe`, `.dll`, and `.sys` formats
-- 80 command checks across core Rizin, rz-ghidra, jsdec, and rz-retdec
-
-**Result**
-
-```text
-80 / 80 passed
-```
-
-The relocated `rz-ghidra` SLEIGH path resolved correctly to:
-
-```text
-<this-folder>\lib\rizin\plugins\rz_ghidra_sleigh
-```
-
-Bundled FLIRT signatures were also tested with `Fl` and `Fa`; local Windows PE samples produced `flirt.*` matches such as CRT startup, security cookie, string, and runtime helper functions.
-
-`rz-libyara` was tested with YARA rules against `.exe`, `.dll`, and `.sys` samples. The `yaral`, `yaraM`, and `yara.match` flag workflow produced expected matches at each image base. The OpenSSL-backed `hash` module was tested with `hash.md5(...)`, and the Authenticode PE path was tested with `pe.number_of_signatures` plus `pe.signatures[0].verified` on a signed Windows binary.
 
 ## Agent Skill
 
