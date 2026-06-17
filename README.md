@@ -25,10 +25,24 @@ Everything ships as a single bundle, `rizin-windows-x64-0.8.2-bundle.zip`: downl
 
 ## Quick Start
 
-Download `rizin-windows-x64-0.8.2-bundle.zip` from this repository and extract it anywhere. It unpacks to a single `rizin\` folder. Then add that folder's `bin` directory to your `PATH`:
+Download `rizin-windows-x64-0.8.2-bundle.zip` from this repository and extract it anywhere. It unpacks to a single `rizin\` folder. Then add that folder's `bin` directory to your `PATH` — replace `C:\path\to\rizin\bin` with your actual extracted location.
+
+Persistently, for your user account (applies to new terminals opened afterward):
+
+```powershell
+[Environment]::SetEnvironmentVariable("Path",
+  [Environment]::GetEnvironmentVariable("Path", "User") + ";C:\path\to\rizin\bin", "User")
+```
+
+Or just for the current shell session (not saved):
 
 ```powershell
 $env:PATH = "C:\path\to\rizin\bin;$env:PATH"
+```
+
+Then check it works (open a **new** terminal first if you used the persistent command):
+
+```powershell
 rizin -v
 ```
 
@@ -43,8 +57,6 @@ rizin -q -N -c "pdg?" -c "pdd?" -c "pdz?" -c "yara?" -c "q"
 - Windows x64
 - Microsoft Visual C++ Redistributable / runtime, which provides the required DLLs:
   `MSVCP140.dll`, `VCRUNTIME140.dll`, and `VCRUNTIME140_1.dll`
-
-No global `SLEIGHHOME` environment variable is needed — `rz-ghidra` resolves its data from within the extracted `rizin\` folder.
 
 ## Why Use This Build
 
