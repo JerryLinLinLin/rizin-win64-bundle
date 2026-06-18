@@ -53,6 +53,15 @@ Keep output small so you can actually read it:
   `pdg @ 0x140001000`. This is cleaner than seeking first.
 - Pipe huge output through `head` in your shell, or disassemble a bounded count (`pd 40`).
 
+**Reuse analysis instead of re-running it.** Every `rizin -A … <file>` re-runs `aaa`, which is
+the slow/expensive part — wasteful if you issue many queries about one binary (especially a
+large one). Analyze once, save a project, then reload it instantly (no `-A`) for the rest:
+
+```
+rizin -A -q -N -e scr.color=0 -c "Ps sample.rzdb" sample.exe         # analyze once → save
+rizin -p sample.rzdb -q -N -e scr.color=0 -c "afl" -c "pdg @ main"   # reload, no re-analysis
+```
+
 ## Core syntax (worth knowing)
 
 | Syntax | Meaning |
@@ -134,7 +143,7 @@ Often you don't need to seek at all — just append `@ <addr>` to a print/decomp
 | `pdr` | Disassemble recursively over the function's basic-block graph. |
 | `pds` | Function summary: its strings, calls, and refs without the full listing — fast triage. |
 | `px <n>` | Hexdump n bytes. `pxr` annotates words with refs (good for reading the stack/IAT). |
-| `ps` / `psz @ addr` | Print an auto-detected / null-terminated string. |
+| `ps` / `psw @ addr` | Print a string at the address — `ps` (UTF-8, null-terminated) or `psw` (UTF-16LE = Windows wide strings). |
 
 ## Cross-references (the key to stripped code)
 
@@ -178,7 +187,9 @@ decompiler name in isolation — **cross-reference with rizin's own analysis:**
 - `ii` + `axt @ sym.imp.<API>` to confirm which real API an ambiguous call resolves to.
 - `pdf` (raw disassembly) to check what the decompiler glossed over — e.g. a `(*(code*)0x…)`
   pointer often shows in `pdf` as `call qword [sym.imp.<dll>_<API>]`, naming the real import.
-- `afn` to rename the function once you know it, then re-run the decompiler so the name propagates.
+- `afn` to rename the function once you know it, then re-run the decompiler so the name
+  propagates (likewise `afs` to set its prototype and `afvt` to type a local — both sharpen the
+  decompiler's output).
 - Compare `pdg` vs `pdz` vs `pdd` — where they agree you can trust it; where they differ, dig in.
 
 ## Searching
@@ -209,6 +220,8 @@ decompiler name in isolation — **cross-reference with rizin's own analysis:**
 - **Driver (.sys)** — `iI` shows `os native` / `subsys Native`; `il` reveals the type
   (`fltmgr.sys` ⇒ file-system minifilter, `ndis.sys` ⇒ network, `ntoskrnl.exe` ⇒ core kernel).
   `entry0` is `DriverEntry`; from there follow calls to the dispatch/registration routines.
+- **Wide strings** — Windows `…W` APIs use UTF-16; `iz`/`izz` detect them, and `psw @ addr`
+  prints one (use plain `ps` for ASCII/UTF-8).
 - **Dynamic API resolution** — `LoadLibrary`/`GetModuleHandle` + `GetProcAddress` patterns
   (common in packers/malware) hide real calls from the import table. Spot them via `afns`
   (the resolved API names appear as referenced strings) and confirm in the disassembly.
