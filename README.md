@@ -7,7 +7,7 @@ A Windows x64 build of Rizin bundling three decompiler plugins (rz-ghidra, jsdec
 | Decompiler | Command | Output style |
 | --- | --- | --- |
 | `rz-ghidra` | `pdg` | Ghidra-style C pseudocode |
-| `jsdec` | `pdd` | Lightweight JavaScript-style pseudocode |
+| `jsdec` | `pdd` | Lightweight, register-level C pseudocode |
 | `rz-retdec` | `pdz` | RetDec-generated C |
 
 Everything ships as a single bundle, `rizin-windows-x64-0.8.2-bundle.zip`: download it, extract it anywhere, add `bin` to your `PATH`, and you have Rizin with all three decompilers, YARA scanning, and bundled signatures — no plugins to build yourself.

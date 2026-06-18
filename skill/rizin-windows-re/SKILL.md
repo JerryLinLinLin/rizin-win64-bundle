@@ -154,11 +154,11 @@ with `pdg` → `afn` it a real name → follow `axf`/`axt` outward.
 
 This bundle ships three. They disagree in useful ways; when one is unclear, run another.
 
-| Command | Engine | Use it for |
+| Command | Engine | When to use |
 | --- | --- | --- |
-| `pdg` | rz-ghidra | **Default.** Best structure and control flow; recovers Windows struct types (e.g. `LPSTARTUPINFOW`, `DWORD`). |
-| `pdz` | rz-retdec | Clean C with `windows.h` types; tends to resolve imported API names well and labels FLIRT functions. A strong second opinion. |
-| `pdd` | jsdec | Fast and light; often names imported calls, but output is lower-level (register-style). Good quick look. |
+| `pdg` | rz-ghidra | **Default — reach for it first.** Best structure and control flow; recovers Windows struct types (e.g. `LPSTARTUPINFOW`, `DWORD`). |
+| `pdd` | jsdec | A fast, lightweight pass / quick look. Output is lower-level (register-style) and often names imported calls. |
+| `pdz` | rz-retdec | A second opinion when the other two disagree. Clean C with `windows.h` types; resolves imported API names and FLIRT labels well. |
 
 Add `o` for side-by-side offsets (`pdgo`, `pdzo`, `pddo`) and `j` for JSON (`pdgj`, …).
 Decompile a specific function with `@`: `pdg @ fcn.140001a10`.
