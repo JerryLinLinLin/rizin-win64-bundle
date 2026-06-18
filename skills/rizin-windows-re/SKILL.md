@@ -1,20 +1,16 @@
 ---
 name: rizin-windows-re
 description: >-
-  The go-to cheatsheet for static reverse engineering and binary analysis with rizin (the
-  prebuilt bundle: rizin plus the rz-ghidra `pdg`, jsdec `pdd`, and rz-retdec `pdz`
-  decompilers, rz-libyara, and bundled FLIRT signatures). Use it for essentially ANY
-  reverse-engineering or binary-inspection task, on ANY file format rizin understands —
-  PE (.exe/.dll/.sys), ELF, Mach-O, firmware, shellcode, or raw blobs — on any platform,
-  not just Windows. Reach for it whenever you disassemble, decompile, or inspect a binary:
-  listing imports/exports/strings/symbols, mapping cross-references, recovering what
-  unnamed functions do, identifying or triaging an unknown or suspicious binary, CTF or
-  malware analysis, or just driving rizin from the command line. Trigger it even when the
-  user only says things like "analyze this binary", "what does this program/exe/dll do",
-  "decompile this function", "disassemble this", "triage this sample", "is this malware",
-  or mentions rizin/radare2. Assumes rizin and its plugins are on PATH (commands `rizin`,
-  `pdg`, `pdd`, `pdz`, `afl`, `axt`, `ii`, `iz`…); includes extra hints for Windows
-  PE/driver targets. Not for dynamic/live debugging or .NET/managed-only decompilation.
+  Cheatsheet for static reverse engineering and binary analysis with the rizin bundle
+  (rz-ghidra `pdg`, jsdec `pdd`, rz-retdec `pdz` decompilers, rz-libyara, FLIRT). Use it for
+  essentially any RE or binary-inspection task on any format rizin parses — PE (.exe/.dll/.sys),
+  ELF, Mach-O, firmware, shellcode, or raw — on any platform, not just Windows. Reach for it to
+  disassemble, decompile, or inspect a binary: imports/exports/strings/symbols, cross-references,
+  recovering unnamed functions, or identifying and triaging an unknown or suspicious binary (CTF
+  or malware analysis). Trigger it even on casual phrasings like "analyze this binary", "what
+  does this exe/dll do", "decompile this function", or "is this malware", or any rizin/radare2
+  mention. Assumes rizin and its plugins are on PATH; includes extra Windows PE/driver hints.
+  Not for live debugging or .NET/managed-only decompilation.
 ---
 
 # Rizin RE Cheatsheet

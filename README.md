@@ -163,7 +163,7 @@ fl             # list the matched library-function flags
 
 ## Agent Skill
 
-This repo also ships a Claude Code **skill** that teaches an AI agent how to drive this bundle for reverse engineering: [`skill/rizin-windows-re/SKILL.md`](skill/rizin-windows-re/SKILL.md) (also packaged as [`skill/rizin-windows-re.skill`](skill/rizin-windows-re.skill)).
+This repo also ships a Claude Code **skill** that teaches an AI agent how to drive this bundle for reverse engineering: [`skills/rizin-windows-re/SKILL.md`](skills/rizin-windows-re/SKILL.md) (also packaged as [`skills/rizin-windows-re.skill`](skills/rizin-windows-re.skill)).
 
 It's a concise cheatsheet — how to run rizin non-interactively, the most useful commands grouped by purpose (triage, imports/exports, analysis, functions, cross-references, disassembly, the three decompilers, YARA), which decompiler to reach for and how to cross-reference when symbols are missing, plus extra Windows PE/driver hints. The command reference is generic, so it works on any binary rizin can parse — not just Windows.
 
