@@ -2,7 +2,7 @@
 name: rizin-windows-re
 description: >-
   Cheatsheet for static reverse engineering and binary analysis with the rizin bundle
-  (rz-ghidra `pdg`, jsdec `pdd`, rz-retdec `pdz` decompilers, rz-libyara, FLIRT). Use it for
+  (rz-retdec `pdz`, rz-ghidra `pdg`, jsdec `pdd` decompilers, rz-libyara, FLIRT). Use it for
   essentially any RE or binary-inspection task on any format rizin parses — PE (.exe/.dll/.sys),
   ELF, Mach-O, firmware, shellcode, or raw — on any platform, not just Windows. Reach for it to
   disassemble, decompile, or inspect a binary: imports/exports/strings/symbols, cross-references,
