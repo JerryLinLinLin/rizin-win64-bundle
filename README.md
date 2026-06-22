@@ -6,9 +6,9 @@ A Windows x64 build of Rizin bundling three decompiler plugins (rz-ghidra, jsdec
 
 | Decompiler | Command | Output style |
 | --- | --- | --- |
+| `rz-retdec` | `pdz` | RetDec-generated C |
 | `rz-ghidra` | `pdg` | Ghidra-style C pseudocode |
 | `jsdec` | `pdd` | Lightweight, register-level C pseudocode |
-| `rz-retdec` | `pdz` | RetDec-generated C |
 
 Everything ships as a single bundle, `rizin-windows-x64-0.8.2-bundle.zip`: download it, extract it anywhere, add `bin` to your `PATH`, and you have Rizin with all three decompilers, YARA scanning, and bundled signatures — no plugins to build yourself.
 
@@ -62,9 +62,9 @@ rizin -q -N -c "pdg?" -c "pdd?" -c "pdz?" -c "yara?" -c "q"
 
 Three decompilers live side by side in one portable Rizin setup, so you can cross-check results without switching tools or maintaining three separate plugin build environments:
 
-- **`pdg` (Ghidra)** — reach for this first; it's the default for general-purpose work.
+- **`pdz` (RetDec)** — reach for this first; a clean default that resolves imports and types well.
+- **`pdg` (Ghidra)** — a strong alternative with the best structural recovery.
 - **`pdd` (jsdec)** — when you want a fast, lightweight pass.
-- **`pdz` (RetDec)** — a second opinion when the other two disagree.
 
 That makes this a practical toolkit for repeated Windows malware and reversing work, where quick comparison across decompilers matters most.
 

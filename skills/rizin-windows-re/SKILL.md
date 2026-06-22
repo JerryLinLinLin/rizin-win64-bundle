@@ -161,9 +161,9 @@ This bundle ships three. They disagree in useful ways; when one is unclear, run 
 
 | Command | Engine | When to use |
 | --- | --- | --- |
-| `pdg` | rz-ghidra | **Default — reach for it first.** Best structure and control flow; recovers Windows struct types (e.g. `LPSTARTUPINFOW`, `DWORD`). |
+| `pdz` | rz-retdec | **Default — reach for it first.** Clean C with `windows.h` types; resolves imported API names and FLIRT labels well. |
+| `pdg` | rz-ghidra | Strong alternative — often the best structural/control-flow recovery; recovers Windows struct types (e.g. `LPSTARTUPINFOW`, `DWORD`). |
 | `pdd` | jsdec | A fast, lightweight pass / quick look. Output is lower-level (register-style) and often names imported calls. |
-| `pdz` | rz-retdec | A second opinion when the other two disagree. Clean C with `windows.h` types; resolves imported API names and FLIRT labels well. |
 
 Add `o` for side-by-side offsets (`pdgo`, `pdzo`, `pddo`) and `j` for JSON (`pdgj`, …).
 Decompile a specific function with `@`: `pdg @ fcn.140001a10`.
@@ -186,7 +186,7 @@ decompiler name in isolation — **cross-reference with rizin's own analysis:**
 - `afn` to rename the function once you know it, then re-run the decompiler so the name
   propagates (likewise `afs` to set its prototype and `afvt` to type a local — both sharpen the
   decompiler's output).
-- Compare `pdg` vs `pdz` vs `pdd` — where they agree you can trust it; where they differ, dig in.
+- Compare `pdz` vs `pdg` vs `pdd` — where they agree you can trust it; where they differ, dig in.
 
 ## Searching
 
@@ -237,8 +237,8 @@ rizin -q -N -e scr.color=0 -c "iiq" -c "izzq" sample.dll
 # Analyze, then list functions as a table
 rizin -A -q -N -e scr.color=0 -c aflt sample.exe
 
-# Decompile one function with Ghidra
-rizin -A -q -N -e scr.color=0 -c "pdg @ 0x140001a10" sample.exe
+# Decompile one function (RetDec is the default; pdg / pdd are alternatives)
+rizin -A -q -N -e scr.color=0 -c "pdz @ 0x140001a10" sample.exe
 
 # Who calls a risky API?
 rizin -A -q -N -e scr.color=0 -c "axt @ sym.imp.KERNEL32.dll_CreateProcessW" sample.exe
