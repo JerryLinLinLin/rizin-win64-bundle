@@ -19,6 +19,7 @@ Everything ships as a single bundle, `rizin-windows-x64-0.8.2-bundle.zip`: downl
 - [Why Use This Build](#why-use-this-build)
 - [Included Components](#included-components)
 - [What's Customized](#whats-customized)
+- [Local Build / Development](#local-build--development)
 - [Example Commands](#example-commands)
 - [Agent Skill](#agent-skill)
 - [License](#license)
@@ -74,12 +75,14 @@ That makes this a practical toolkit for repeated Windows malware and reversing w
 
 | Component | Commands | Source | Commit |
 | --- | --- | --- | --- |
-| Rizin | `rizin` | [rizinorg/rizin](https://github.com/rizinorg/rizin) | [`5a611ee`](https://github.com/rizinorg/rizin/commit/5a611eee2999d312317ff90d600e37dde0f58992) |
-| rz-ghidra | `pdg`, `pdgo`, `pdgj`, `pdgs` | [rizinorg/rz-ghidra](https://github.com/rizinorg/rz-ghidra) | [`c40f616`](https://github.com/rizinorg/rz-ghidra/commit/c40f61621b4561da8da538ce3b12cd8892a59a93) + local Windows portability patches |
-| jsdec | `pdd`, `pddo`, `pddj` | [rizinorg/jsdec](https://github.com/rizinorg/jsdec) | [`068f799`](https://github.com/rizinorg/jsdec/commit/068f799e5e362bf10fdba8bfdf8c3274fc11f344) |
-| rz-retdec | `pdz`, `pdzo`, `pdzj` | [rizinorg/rz-retdec](https://github.com/rizinorg/rz-retdec) | [`4ac6b29`](https://github.com/rizinorg/rz-retdec/commit/4ac6b293553d7f5f00574e4dca4c21b799db63e1) + local Windows/Rizin API patches |
-| rz-libyara | `yarac`, `yarad`, `yaral`, `yaraM`, `yaras`, `yaram` | [rizinorg/rz-libyara](https://github.com/rizinorg/rz-libyara) | [`d00e827`](https://github.com/rizinorg/rz-libyara/commit/d00e827c611334bf6320198ca21e1b4124b77fe3) + local Rizin 0.8.x API patch |
-| Rizin sigdb | `Fl`, `Fa`, `Fs`, `Ff` | [rizinorg/sigdb](https://github.com/rizinorg/sigdb) | [`4addbed`](https://github.com/rizinorg/sigdb/commit/4addbed50cd3b50eeef5a41d72533d079ebbfbf8) |
+| Rizin | `rizin` | [JerryLinLinLin/rizin](https://github.com/JerryLinLinLin/rizin) ([upstream](https://github.com/rizinorg/rizin)) | [`5a611ee`](https://github.com/JerryLinLinLin/rizin/commit/5a611eee2999d312317ff90d600e37dde0f58992) |
+| rz-ghidra | `pdg`, `pdgo`, `pdgj`, `pdgs` | [JerryLinLinLin/rz-ghidra](https://github.com/JerryLinLinLin/rz-ghidra) ([upstream](https://github.com/rizinorg/rz-ghidra)) | [`8da1a3d`](https://github.com/JerryLinLinLin/rz-ghidra/commit/8da1a3d515567c015926f9ec91b5d791d1b3c3aa) |
+| jsdec | `pdd`, `pddo`, `pddj` | [JerryLinLinLin/jsdec](https://github.com/JerryLinLinLin/jsdec) ([upstream](https://github.com/rizinorg/jsdec)) | [`068f799`](https://github.com/JerryLinLinLin/jsdec/commit/068f799e5e362bf10fdba8bfdf8c3274fc11f344) |
+| rz-retdec | `pdz`, `pdzo`, `pdzj` | [JerryLinLinLin/rz-retdec](https://github.com/JerryLinLinLin/rz-retdec) ([upstream](https://github.com/rizinorg/rz-retdec)) | [`0b065b6`](https://github.com/JerryLinLinLin/rz-retdec/commit/0b065b6a98e526ddcd6f43ede6d5aa645a50206d) |
+| rz-libyara | `yarac`, `yarad`, `yaral`, `yaraM`, `yaras`, `yaram` | [JerryLinLinLin/rz-libyara](https://github.com/JerryLinLinLin/rz-libyara) ([upstream](https://github.com/rizinorg/rz-libyara)) | [`1de567e`](https://github.com/JerryLinLinLin/rz-libyara/commit/1de567ebe29f57628561e0119b21c4fe9f25f27c) |
+| Rizin sigdb | `Fl`, `Fa`, `Fs`, `Ff` | [JerryLinLinLin/sigdb](https://github.com/JerryLinLinLin/sigdb) ([upstream](https://github.com/rizinorg/sigdb)) | [`4addbed`](https://github.com/JerryLinLinLin/sigdb/commit/4addbed50cd3b50eeef5a41d72533d079ebbfbf8) |
+
+The source repositories are also included as Git submodules under `sources/`, all tracking the `windows-bundle-v0.8.2` branch.
 
 ## What's Customized
 
@@ -90,6 +93,8 @@ This is more than just unzipping stock Rizin. It carries several Windows-focused
 - **DLL load fix** — `core_ghidra.dll` is also placed in `bin` so Windows can resolve it when
   `asm_ghidra.dll` and `analysis_ghidra.dll` load.
 - **rz-retdec rebuilt** — patched for the Rizin 0.8.x API and for MSVC/Windows linking.
+- **rz-retdec VS 2026 fixes** — the bundled RetDec build is patched for CMake 4.x compatibility,
+  old yaramod/fmt MSVC behavior, OpenSSL 1.1 Authenticode linking, and Windows install path normalization.
 - **Bundled OpenSSL side by side** — OpenSSL 1.1 runtime DLLs are kept for `rz-retdec`, while
   OpenSSL 3.5 runtime DLLs are kept for `rz-libyara`'s hash and Authenticode support:
   `libcrypto-1_1-x64.dll`, `libssl-1_1-x64.dll`, `libcrypto-3-x64.dll`, and `libssl-3-x64.dll`.
@@ -103,6 +108,105 @@ This is more than just unzipping stock Rizin. It carries several Windows-focused
 - **Bundled FLIRT signatures** — the official Rizin signature database is included at
   `share\sigdb`, so `Fl` and `Fa` work without downloading a separate database.
 - **Relocation-tested** — the whole `rizin` folder was moved to a new path and re-tested to confirm every plugin still works.
+
+## Local Build / Development
+
+Clone with submodules:
+
+```powershell
+git clone --recursive https://github.com/JerryLinLinLin/rizin-win64-bundle.git
+cd rizin-win64-bundle
+```
+
+If you already cloned without `--recursive`:
+
+```powershell
+git submodule update --init --recursive
+```
+
+This repo stores a ready-to-run runtime under `build\rizin`. The `sources\rizin` submodule is pinned for provenance; the bundle runtime itself starts from the official shared Windows Rizin 0.8.2 build, then the plugins and data are installed into that prefix.
+
+Build from a **Developer PowerShell / Developer Command Prompt for Visual Studio 2026**. Set these paths first:
+
+```powershell
+$Prefix = "$PWD\build\rizin"
+$OpenSSL11 = "C:\path\to\openssl-1.1.1w\x64"
+$OpenSSL3 = "C:\path\to\openssl-3.5.7-firedaemon\x64"
+$env:PATH = "$Prefix\bin;$OpenSSL11\bin;$OpenSSL3\bin;$env:PATH"
+$env:PKG_CONFIG_PATH = "$Prefix\lib\pkgconfig;$env:PKG_CONFIG_PATH"
+$env:CMAKE_PREFIX_PATH = "$Prefix;$OpenSSL3;$env:CMAKE_PREFIX_PATH"
+```
+
+You also need CMake, Meson, and Ninja available in that shell. The OpenSSL 3 path is intentionally exposed through `CMAKE_PREFIX_PATH` for `rz-libyara`; `rz-retdec` still receives the OpenSSL 1.1 prefix explicitly.
+
+Rebuild and install `rz-ghidra`:
+
+```powershell
+cmake -S sources\rz-ghidra -B sources\rz-ghidra\build-vs2026 -G "Visual Studio 18 2026" -A x64 `
+  -DCMAKE_PREFIX_PATH="$Prefix" `
+  -DCMAKE_INSTALL_PREFIX="$Prefix" `
+  -DBUILD_CUTTER_PLUGIN=OFF
+cmake --build sources\rz-ghidra\build-vs2026 --config Release --target install
+Copy-Item "$Prefix\lib\rizin\plugins\core_ghidra.dll" "$Prefix\bin\core_ghidra.dll" -Force
+```
+
+Rebuild and install `jsdec`:
+
+```powershell
+meson setup sources\jsdec\build-vs2026 sources\jsdec --backend=ninja --buildtype=release -Db_vscrt=md `
+  --prefix="$Prefix" `
+  -Drizin_plugdir="$Prefix\lib\rizin\plugins" `
+  -Dbuild_type=rizin
+meson compile -C sources\jsdec\build-vs2026
+meson install -C sources\jsdec\build-vs2026
+```
+
+Rebuild and install `rz-retdec`:
+
+```powershell
+cmake -S sources\rz-retdec -B sources\rz-retdec\build-vs2026 -G "Visual Studio 18 2026" -A x64 `
+  -DCMAKE_PREFIX_PATH="$Prefix;$OpenSSL11" `
+  -DCMAKE_INSTALL_PREFIX="$Prefix" `
+  -DBUILD_CUTTER_PLUGIN=OFF `
+  -DRZ_RETDEC_DOC=OFF `
+  -DBUILD_BUNDLED_RETDEC=ON
+cmake --build sources\rz-retdec\build-vs2026 --config Release --target install
+Copy-Item "$OpenSSL11\bin\libcrypto-1_1-x64.dll" "$Prefix\bin\" -Force
+Copy-Item "$OpenSSL11\bin\libssl-1_1-x64.dll" "$Prefix\bin\" -Force
+```
+
+Rebuild and install `rz-libyara` with OpenSSL 3:
+
+```powershell
+meson setup sources\rz-libyara\build-vs2026-openssl3 sources\rz-libyara --backend=ninja --buildtype=release -Db_vscrt=md `
+  --prefix="$Prefix" `
+  -Drizin_plugdir="$Prefix\lib\rizin\plugins" `
+  -Duse_sys_yara=disabled `
+  -Denable_openssl=true
+meson compile -C sources\rz-libyara\build-vs2026-openssl3
+meson install -C sources\rz-libyara\build-vs2026-openssl3
+Copy-Item "$OpenSSL3\bin\libcrypto-3-x64.dll" "$Prefix\bin\" -Force
+Copy-Item "$OpenSSL3\bin\libssl-3-x64.dll" "$Prefix\bin\" -Force
+```
+
+Refresh bundled FLIRT signatures from the submodule:
+
+```powershell
+robocopy sources\sigdb "$Prefix\share\sigdb" /E /XD .git
+```
+
+After local installs, remove generated import libraries from the runtime plugin directory:
+
+```powershell
+Remove-Item "$Prefix\lib\rizin\plugins\*.lib" -Force -ErrorAction SilentlyContinue
+```
+
+Quick verification:
+
+```powershell
+$env:SLEIGHHOME = $null
+rizin -q -N -c "pdg?" -c "pdd?" -c "pdz?" -c "yara?" -c "q" C:\path\to\sample.exe
+```
 
 ## Example Commands
 
