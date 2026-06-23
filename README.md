@@ -10,7 +10,7 @@ A Windows x64 build of Rizin bundling three decompiler plugins (rz-ghidra, jsdec
 | `rz-ghidra` | `pdg` | Ghidra-style C pseudocode |
 | `jsdec` | `pdd` | Lightweight, register-level C pseudocode |
 
-Everything ships as a single bundle, `rizin-windows-x64-0.8.2-bundle.zip`: download it, extract it anywhere, add `bin` to your `PATH`, and you have Rizin with all three decompilers, YARA scanning, and bundled signatures — no plugins to build yourself.
+Everything ships as a single bundle, `rizin-windows-x64-bundle-v0.1.0.zip`: download it, extract it anywhere, add `bin` to your `PATH`, and you have Rizin with all three decompilers, YARA scanning, and bundled signatures — no plugins to build yourself.
 
 ## Contents
 
@@ -26,7 +26,7 @@ Everything ships as a single bundle, `rizin-windows-x64-0.8.2-bundle.zip`: downl
 
 ## Quick Start
 
-Download `rizin-windows-x64-0.8.2-bundle.zip` from this repository and extract it anywhere. It unpacks to a single `rizin\` folder. Then add that folder's `bin` directory to your `PATH` — replace `C:\path\to\rizin\bin` with your actual extracted location.
+Download `rizin-windows-x64-bundle-v0.1.0.zip` from this repository's release artifacts and extract it anywhere. It unpacks to a single `rizin\` folder. Then add that folder's `bin` directory to your `PATH` — replace `C:\path\to\rizin\bin` with your actual extracted location.
 
 Persistently, for your user account (applies to new terminals opened afterward):
 
@@ -126,6 +126,11 @@ git submodule update --init --recursive
 
 This repo stores a ready-to-run runtime under `build\rizin`. The `sources\rizin` submodule is pinned for provenance; the bundle runtime itself starts from the official shared Windows Rizin 0.8.2 build, then the plugins and data are installed into that prefix.
 
+OpenSSL build inputs:
+
+- **OpenSSL 3.5.7 LTS ZIP for Windows** — use the FireDaemon x86+x64+ARM64 ZIP from the [FireDaemon OpenSSL downloads](https://kb.firedaemon.com/support/solutions/articles/4000121705-openssl-binary-distributions-for-microsoft-windows). This is used by `rz-libyara`; the ZIP SHA-256 used for this bundle is `2591459A06A6DF2D2E2B23B02A28D7C180B95C02FB4965099A708B7365A74014`.
+- **OpenSSL 1.1.1w x64 SDK/runtime** — use a Windows build that provides `include\`, `lib\libcrypto.lib`, `bin\libcrypto-1_1-x64.dll`, and `bin\libssl-1_1-x64.dll`. FireDaemon's historical 1.1.1w ZIP is listed in the same downloads article, and the official OpenSSL 1.1.1w source remains available from the [OpenSSL old 1.1.1 releases](https://openssl-library.org/source/old/1.1.1/) if you need to rebuild it yourself.
+
 Build from a **Developer PowerShell / Developer Command Prompt for Visual Studio 2026**. Set these paths first:
 
 ```powershell
@@ -207,6 +212,16 @@ Quick verification:
 $env:SLEIGHHOME = $null
 rizin -q -N -c "pdg?" -c "pdd?" -c "pdz?" -c "yara?" -c "q" C:\path\to\sample.exe
 ```
+
+Package a release ZIP after creating a Git tag:
+
+```powershell
+git tag v0.1.0
+git push origin v0.1.0
+powershell -ExecutionPolicy Bypass -File scripts\package-bundle.ps1
+```
+
+The script reads the latest Git tag and writes `build\rizin-windows-x64-bundle-<tag>.zip`. Release ZIP files live under `build\`, which is intentionally ignored by Git.
 
 ## Example Commands
 
