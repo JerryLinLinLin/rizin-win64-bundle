@@ -1,13 +1,21 @@
 [CmdletBinding()]
 param(
-    [string]$RuntimeDir = (Join-Path $PSScriptRoot "..\build\rizin"),
-    [string]$OutputDir = (Join-Path $PSScriptRoot "..\build"),
+    [string]$RuntimeDir = "",
+    [string]$OutputDir = "",
     [string]$ArchivePrefix = "rizin-windows-x64-bundle"
 )
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
+$scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+if (-not $RuntimeDir) {
+    $RuntimeDir = Join-Path $scriptRoot "..\build\rizin"
+}
+if (-not $OutputDir) {
+    $OutputDir = Join-Path $scriptRoot "..\build"
+}
+
+$repoRoot = (Resolve-Path -LiteralPath (Join-Path $scriptRoot "..")).Path
 $runtimePath = (Resolve-Path -LiteralPath $RuntimeDir).Path
 $outputPath = (Resolve-Path -LiteralPath $OutputDir).Path
 
