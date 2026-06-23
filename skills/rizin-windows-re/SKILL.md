@@ -23,6 +23,11 @@ extra PE/driver-specific hints, but everything above it is format-agnostic.
 Assume `rizin` and friends are already on `PATH`. This skill is a cheatsheet, not a fixed
 procedure — pick the commands you need for the question at hand.
 
+> **Decompiling? Default to `pdz` (rz-retdec) — not `pdg`/Ghidra.** Ghidra is the famous name, so
+> it's tempting to reach for `pdg` by reflex; in this bundle `pdz` usually gives cleaner, more
+> directly usable C on Windows binaries. Treat `pdg` as a deliberate second choice — see the
+> **Decompiling** section below.
+
 ## How to drive rizin non-interactively
 
 You are running rizin from a shell tool, not sitting in its interactive prompt. Drive it
@@ -46,7 +51,7 @@ Keep output small so you can actually read it:
 - `~word` is rizin's built-in grep: `afl~main`, `iI~bits,os`. `~?` counts matches: `ii~?`.
 - `q`/`j` suffixes mean quiet/JSON: `iiq` (terse imports), `aflj` (functions as JSON for parsing).
 - `@ <addr>` runs one command at a temporary offset without moving the cursor: `pdf @ main`,
-  `pdg @ 0x140001000`. This is cleaner than seeking first.
+  `pdz @ 0x140001000`. This is cleaner than seeking first.
 - Pipe huge output through `head` in your shell, or disassemble a bounded count (`pd 40`).
 
 **Reuse analysis instead of re-running it.** Every `rizin -A … <file>` re-runs `aaa`, which is
@@ -55,8 +60,49 @@ large one). Analyze once, save a project, then reload it instantly (no `-A`) for
 
 ```
 rizin -A -q -N -e scr.color=0 -c "Ps sample.rzdb" sample.exe         # analyze once → save
-rizin -p sample.rzdb -q -N -e scr.color=0 -c "afl" -c "pdg @ main"   # reload, no re-analysis
+rizin -p sample.rzdb -q -N -e scr.color=0 -c "afl" -c "pdz @ main"   # reload, no re-analysis
 ```
+
+## Decompiling
+
+Decompiling is the headline feature of this bundle, so choose the engine deliberately.
+**Default to `pdz` (rz-retdec) — reach for it first.** Ghidra (`pdg`) is the better-known
+decompiler in general, so it's tempting to reach for it by reflex — resist that here: on
+Windows PEs `pdz` tends to emit clean C with `windows.h` types and to name imported APIs and
+FLIRT functions, whereas `pdg` often leaves IAT or dynamically-resolved calls as raw pointers
+like `(*(code *)0x22a76)(...)`. Use `pdg` as a deliberate second choice (it usually has the
+best structural/control-flow recovery), and `pdd` for a fast look. When one is unclear, run
+another.
+
+| Command | Engine | When to use |
+| --- | --- | --- |
+| `pdz` | rz-retdec | **Default — reach for it first.** Clean C with `windows.h` types; names imported APIs and FLIRT labels well. |
+| `pdg` | rz-ghidra | Deliberate second choice — usually the best structural/control-flow recovery; recovers Windows struct types (e.g. `LPSTARTUPINFOW`, `DWORD`). |
+| `pdd` | jsdec | A fast, lightweight pass / quick look. Output is lower-level (register-style) and often names imported calls. |
+
+Add `o` for side-by-side offsets (`pdzo`, `pdgo`, `pddo`) and `j` for JSON (`pdzj`, …).
+Decompile a specific function with `@`: `pdz @ fcn.140001a10`.
+
+**Gotchas:** the decompilers work on the *current function*, so analyze first (`-A`/`aaa`, or
+`af` at the address) — otherwise you get a *"No function at this offset"* error. `pdg` can be
+slow on very large functions and `pdz` is expensive on large binaries, so decompile specific
+functions with `@ <addr>` rather than the whole program.
+
+**The limitation to plan around:** decompiler output is only as good as the analysis under it.
+Names appear as `fcn.xxxx` / `sub_xxxx` when there are no symbols (common in stripped or Windows
+binaries), and dynamically-resolved or IAT calls can show as raw pointers — e.g. `pdg` may
+render an imported call as `(*(code *)0x22a76)(...)` instead of the real API (one reason `pdz`
+is the default here). Don't trust a decompiler name in isolation — **cross-reference with
+rizin's own analysis:**
+
+- `afns` / `axf` to see the strings and calls a function makes — that usually reveals its job.
+- `ii` + `axt @ sym.imp.<API>` to confirm which real API an ambiguous call resolves to.
+- `pdf` (raw disassembly) to check what the decompiler glossed over — e.g. a `(*(code*)0x…)`
+  pointer often shows in `pdf` as `call qword [sym.imp.<dll>_<API>]`, naming the real import.
+- `afn` to rename the function once you know it, then re-run the decompiler so the name
+  propagates (likewise `afs` to set its prototype and `afvt` to type a local — both sharpen the
+  decompiler's output).
+- Compare `pdz` vs `pdg` vs `pdd` — where they agree you can trust it; where they differ, dig in.
 
 ## Core syntax (worth knowing)
 
@@ -153,40 +199,7 @@ When functions are unnamed (`fcn.*`), xrefs are how you recover meaning.
 | `axt @@f:str.*` | Refs to every string — find the code that uses a telling string. |
 
 Typical move: find an interesting string or import → `axt` to the function using it → read it
-with `pdg` → `afn` it a real name → follow `axf`/`axt` outward.
-
-## Decompilers — which to use
-
-This bundle ships three. They disagree in useful ways; when one is unclear, run another.
-
-| Command | Engine | When to use |
-| --- | --- | --- |
-| `pdz` | rz-retdec | **Default — reach for it first.** Clean C with `windows.h` types; resolves imported API names and FLIRT labels well. |
-| `pdg` | rz-ghidra | Strong alternative — often the best structural/control-flow recovery; recovers Windows struct types (e.g. `LPSTARTUPINFOW`, `DWORD`). |
-| `pdd` | jsdec | A fast, lightweight pass / quick look. Output is lower-level (register-style) and often names imported calls. |
-
-Add `o` for side-by-side offsets (`pdgo`, `pdzo`, `pddo`) and `j` for JSON (`pdgj`, …).
-Decompile a specific function with `@`: `pdg @ fcn.140001a10`.
-
-**Gotchas:** the decompilers work on the *current function*, so analyze first (`-A`/`aaa`, or
-`af` at the address) — otherwise `pdg` errors with *"No function at this offset"*. `pdg` can be
-slow on very large functions and `pdz` is expensive on large binaries, so decompile specific
-functions with `@ <addr>` rather than the whole program.
-
-**The limitation to plan around:** decompiler output is only as good as the analysis under it.
-Names appear as `fcn.xxxx` / `sub_xxxx` when there are no symbols (common in stripped or Windows
-binaries), and dynamically-resolved or IAT calls can show as raw pointers — e.g. rz-ghidra may
-render an imported call as `(*(code *)0x22a76)(...)` instead of the real API. Don't trust a
-decompiler name in isolation — **cross-reference with rizin's own analysis:**
-
-- `afns` / `axf` to see the strings and calls a function makes — that usually reveals its job.
-- `ii` + `axt @ sym.imp.<API>` to confirm which real API an ambiguous call resolves to.
-- `pdf` (raw disassembly) to check what the decompiler glossed over — e.g. a `(*(code*)0x…)`
-  pointer often shows in `pdf` as `call qword [sym.imp.<dll>_<API>]`, naming the real import.
-- `afn` to rename the function once you know it, then re-run the decompiler so the name
-  propagates (likewise `afs` to set its prototype and `afvt` to type a local — both sharpen the
-  decompiler's output).
-- Compare `pdz` vs `pdg` vs `pdd` — where they agree you can trust it; where they differ, dig in.
+with `pdz` → `afn` it a real name → follow `axf`/`axt` outward.
 
 ## Searching
 
@@ -212,7 +225,7 @@ decompiler name in isolation — **cross-reference with rizin's own analysis:**
   `ii` for behavior and `iz`/`izz` for strings. `s entry0` is CRT startup; the real logic is
   usually a few calls in — or seek `s main` if present.
 - **DLL** — the exported functions *are* the API surface: list them with `iE`/`iEq` and
-  decompile the interesting ones (`pdg @ sym.<export>`). `il` shows its own dependencies.
+  decompile the interesting ones (`pdz @ sym.<export>`). `il` shows its own dependencies.
 - **Driver (.sys)** — `iI` shows `os native` / `subsys Native`; `il` reveals the type
   (`fltmgr.sys` ⇒ file-system minifilter, `ndis.sys` ⇒ network, `ntoskrnl.exe` ⇒ core kernel).
   `entry0` is `DriverEntry`; from there follow calls to the dispatch/registration routines.
