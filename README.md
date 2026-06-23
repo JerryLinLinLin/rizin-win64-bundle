@@ -19,14 +19,14 @@ Everything ships as a single bundle, `rizin-windows-x64-bundle-v0.1.0.zip`: down
 - [Why Use This Build](#why-use-this-build)
 - [Included Components](#included-components)
 - [What's Customized](#whats-customized)
-- [Local Build / Development](#local-build--development)
 - [Example Commands](#example-commands)
 - [Agent Skill](#agent-skill)
+- [Local Build / Development](#local-build--development)
 - [License](#license)
 
 ## Quick Start
 
-Download `rizin-windows-x64-bundle-v0.1.0.zip` from this repository's release artifacts and extract it anywhere. It unpacks to a single `rizin\` folder. Then add that folder's `bin` directory to your `PATH` — replace `C:\path\to\rizin\bin` with your actual extracted location.
+Download the newest `rizin-windows-x64-bundle-<version>.zip` from the [latest GitHub Release](https://github.com/JerryLinLinLin/rizin-win64-bundle/releases/latest) and extract it anywhere. It unpacks to a single `rizin\` folder. Then add that folder's `bin` directory to your `PATH` — replace `C:\path\to\rizin\bin` with your actual extracted location.
 
 Persistently, for your user account (applies to new terminals opened afterward):
 
@@ -108,6 +108,71 @@ This is more than just unzipping stock Rizin. It carries several Windows-focused
 - **Bundled FLIRT signatures** — the official Rizin signature database is included at
   `share\sigdb`, so `Fl` and `Fa` work without downloading a separate database.
 - **Relocation-tested** — the whole `rizin` folder was moved to a new path and re-tested to confirm every plugin still works.
+
+## Example Commands
+
+> Inside Rizin's own command line, write paths with forward slashes (e.g. `C:/rules/rule.yara`) even on Windows. The PowerShell snippets in [Quick Start](#quick-start) use backslashes because they run in the shell.
+
+Basic Rizin analysis:
+
+```rizin
+aaa            # analyze everything (functions, refs, strings)
+afl            # list the functions found
+s entry0       # seek to the entrypoint
+pdf            # disassemble the current function
+```
+
+Ghidra decompiler (`rz-ghidra`):
+
+```rizin
+pdg            # decompile the current function
+pdgo           # decompile side by side with offsets
+pdgj           # emit the decompiled function as JSON
+pdgs           # list the loaded SLEIGH languages
+```
+
+jsdec (`pdd`):
+
+```rizin
+pdd            # decompile the current function
+pddo           # decompile side by side with offsets
+pddj           # emit the decompiled function as JSON
+```
+
+RetDec (`rz-retdec`):
+
+```rizin
+pdz            # decompile the current function
+pdzo           # decompile side by side with offsets
+pdzj           # emit the decompiled function as JSON
+```
+
+YARA (`rz-libyara`):
+
+```rizin
+yaral C:/rules/example.yara   # parse a .yar/.yara file and apply its rules
+yaraM                         # list all matches found
+fs yara.match                 # switch to the yara.match flag space
+fl                            # list the match flags
+```
+
+FLIRT signatures:
+
+```rizin
+aaa            # run analysis first
+Fl             # list the signatures available in the bundled sigdb
+Fa             # apply matching signatures from the sigdb
+fs flirt       # switch to the flirt flag space
+fl             # list the matched library-function flags
+```
+
+## Agent Skill
+
+This repo also ships a Claude Code **skill** that teaches an AI agent how to drive this bundle for reverse engineering: [`skills/rizin-windows-re/SKILL.md`](skills/rizin-windows-re/SKILL.md) (also packaged as [`skills/rizin-windows-re.skill`](skills/rizin-windows-re.skill)).
+
+It's a concise cheatsheet — how to run rizin non-interactively, the most useful commands grouped by purpose (triage, imports/exports, analysis, functions, cross-references, disassembly, the three decompilers, YARA), which decompiler to reach for and how to cross-reference when symbols are missing, plus extra Windows PE/driver hints. The command reference is generic, so it works on any binary rizin can parse — not just Windows.
+
+**To use it:** copy the `rizin-windows-re` folder into a skills directory Claude Code loads (e.g. a project `.claude/skills/` or your user skills dir), or import the `.skill` package. The agent then applies it automatically for reverse-engineering requests (e.g. "analyze this binary", "decompile this function"), assuming the bundle's `bin` is on `PATH`.
 
 ## Local Build / Development
 
@@ -222,71 +287,6 @@ powershell -ExecutionPolicy Bypass -File scripts\package-bundle.ps1
 ```
 
 The script reads the latest Git tag and writes `build\rizin-windows-x64-bundle-<tag>.zip`. Release ZIP files live under `build\`, which is intentionally ignored by Git.
-
-## Example Commands
-
-> Inside Rizin's own command line, write paths with forward slashes (e.g. `C:/rules/rule.yara`) even on Windows. The PowerShell snippets in [Quick Start](#quick-start) use backslashes because they run in the shell.
-
-Basic Rizin analysis:
-
-```rizin
-aaa            # analyze everything (functions, refs, strings)
-afl            # list the functions found
-s entry0       # seek to the entrypoint
-pdf            # disassemble the current function
-```
-
-Ghidra decompiler (`rz-ghidra`):
-
-```rizin
-pdg            # decompile the current function
-pdgo           # decompile side by side with offsets
-pdgj           # emit the decompiled function as JSON
-pdgs           # list the loaded SLEIGH languages
-```
-
-jsdec (`pdd`):
-
-```rizin
-pdd            # decompile the current function
-pddo           # decompile side by side with offsets
-pddj           # emit the decompiled function as JSON
-```
-
-RetDec (`rz-retdec`):
-
-```rizin
-pdz            # decompile the current function
-pdzo           # decompile side by side with offsets
-pdzj           # emit the decompiled function as JSON
-```
-
-YARA (`rz-libyara`):
-
-```rizin
-yaral C:/rules/example.yara   # parse a .yar/.yara file and apply its rules
-yaraM                         # list all matches found
-fs yara.match                 # switch to the yara.match flag space
-fl                            # list the match flags
-```
-
-FLIRT signatures:
-
-```rizin
-aaa            # run analysis first
-Fl             # list the signatures available in the bundled sigdb
-Fa             # apply matching signatures from the sigdb
-fs flirt       # switch to the flirt flag space
-fl             # list the matched library-function flags
-```
-
-## Agent Skill
-
-This repo also ships a Claude Code **skill** that teaches an AI agent how to drive this bundle for reverse engineering: [`skills/rizin-windows-re/SKILL.md`](skills/rizin-windows-re/SKILL.md) (also packaged as [`skills/rizin-windows-re.skill`](skills/rizin-windows-re.skill)).
-
-It's a concise cheatsheet — how to run rizin non-interactively, the most useful commands grouped by purpose (triage, imports/exports, analysis, functions, cross-references, disassembly, the three decompilers, YARA), which decompiler to reach for and how to cross-reference when symbols are missing, plus extra Windows PE/driver hints. The command reference is generic, so it works on any binary rizin can parse — not just Windows.
-
-**To use it:** copy the `rizin-windows-re` folder into a skills directory Claude Code loads (e.g. a project `.claude/skills/` or your user skills dir), or import the `.skill` package. The agent then applies it automatically for reverse-engineering requests (e.g. "analyze this binary", "decompile this function"), assuming the bundle's `bin` is on `PATH`.
 
 ## License
 
