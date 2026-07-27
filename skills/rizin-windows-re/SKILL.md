@@ -18,6 +18,12 @@ the target formats can come from any platform.
 
 These commands target the bundle's Rizin 0.8.2; use `<command>?` as ground truth.
 
+## Install the dependency
+
+Download the latest portable Windows x64 bundle from
+`https://github.com/JerryLinLinLin/rizin-win64-bundle/releases/latest`, extract it, and add its
+`rizin\bin` directory to the current process `PATH`. Verify with `rizin -v`.
+
 > **Decompiling? Default to `pdz` (rz-retdec) — not `pdg`/Ghidra.** Ghidra is the famous name, so
 > it's tempting to reach for `pdg` by reflex; in this bundle `pdz` usually gives cleaner, more
 > directly usable C on Windows binaries. Treat `pdg` as a deliberate second choice — see the
